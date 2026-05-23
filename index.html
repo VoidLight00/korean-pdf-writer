@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="한국어 원문과 마크다운 초안을 단정한 인쇄용 PDF 문서로 정리하는 웹 도구"
+    />
+    <title>Korean PDF Writer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero__copy">
+          <p class="eyebrow">Korean PDF Writer</p>
+          <h1 id="page-title">한국어 문서를 조용하고 단정한 PDF로.</h1>
+          <p class="lede">
+            초안 마크다운을 붙여 넣으면 화면 오른쪽에서 인쇄용 문서 리듬으로 바로 확인할 수 있습니다.
+          </p>
+        </div>
+        <div class="hero__actions">
+          <button id="print-button" type="button">PDF로 저장</button>
+          <span id="character-count">0자</span>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="문서 작성 영역">
+        <label class="editor">
+          <span>원문</span>
+          <textarea id="source" spellcheck="false"></textarea>
+        </label>
+
+        <article id="paper" class="paper" aria-label="문서 미리보기"></article>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

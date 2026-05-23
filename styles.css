@@ -1,0 +1,258 @@
+:root {
+  --paper: #f5f4ed;
+  --paper-deep: #ebe6d8;
+  --ink: #1f2527;
+  --ink-soft: #60635f;
+  --blue: #1b365d;
+  --line: #d9d2c0;
+  --field: #fbfaf5;
+  --shadow: 0 28px 90px rgb(52 45 31 / 14%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper-deep);
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 16% 12%, rgb(255 255 255 / 56%), transparent 28rem),
+    linear-gradient(135deg, var(--paper), var(--paper-deep));
+  font-family: "Noto Serif KR", "Apple SD Gothic Neo", serif;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+main {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: clamp(28px, 5vw, 72px);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(24px, 6vw, 96px);
+  align-items: end;
+  margin-bottom: clamp(28px, 5vw, 64px);
+}
+
+.hero__copy {
+  max-width: 760px;
+}
+
+.eyebrow {
+  margin: 0 0 18px;
+  color: var(--blue);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+.hero h1 {
+  margin-bottom: 22px;
+  font-size: clamp(2.65rem, 7vw, 6.8rem);
+  font-weight: 500;
+  letter-spacing: -0.07em;
+  line-height: 0.94;
+}
+
+.lede {
+  max-width: 560px;
+  color: var(--ink-soft);
+  font-size: clamp(1rem, 1.3vw, 1.24rem);
+  line-height: 1.82;
+  word-break: keep-all;
+}
+
+.hero__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+button {
+  border: 1px solid var(--blue);
+  padding: 14px 22px;
+  color: var(--field);
+  background: var(--blue);
+  cursor: pointer;
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+button:hover {
+  background: #25436e;
+  transform: translateY(-1px);
+}
+
+button:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--blue), transparent 68%);
+  outline-offset: 3px;
+}
+
+.hero__actions span {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.82fr) minmax(420px, 1.18fr);
+  gap: clamp(22px, 4vw, 52px);
+  align-items: start;
+}
+
+.editor {
+  display: grid;
+  gap: 12px;
+  min-height: 720px;
+}
+
+.editor span {
+  color: var(--blue);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+textarea {
+  width: 100%;
+  min-height: 720px;
+  border: 1px solid var(--line);
+  padding: 24px;
+  resize: vertical;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--field), transparent 4%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 36%);
+  font-family: "Noto Serif KR", "Apple SD Gothic Neo", serif;
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.paper {
+  min-height: 720px;
+  padding: clamp(42px, 7vw, 88px);
+  background:
+    linear-gradient(90deg, rgb(27 54 93 / 5%) 0 1px, transparent 1px),
+    var(--field);
+  background-size: 44px 100%;
+  border: 1px solid color-mix(in srgb, var(--line), transparent 14%);
+  box-shadow: var(--shadow);
+}
+
+.paper h1 {
+  margin-bottom: 2.4rem;
+  color: var(--blue);
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 1.08;
+  word-break: keep-all;
+}
+
+.paper h2 {
+  margin: 3rem 0 1.05rem;
+  color: var(--blue);
+  font-size: clamp(1.22rem, 2vw, 1.64rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.36;
+  word-break: keep-all;
+}
+
+.paper p,
+.paper li {
+  color: var(--ink);
+  font-size: clamp(1rem, 1.35vw, 1.12rem);
+  line-height: 1.92;
+  letter-spacing: -0.012em;
+  word-break: keep-all;
+}
+
+.paper p {
+  margin-bottom: 1.18rem;
+}
+
+.paper ul,
+.paper ol {
+  margin: 0 0 1.8rem;
+  padding-left: 1.2rem;
+}
+
+.paper li::marker {
+  color: var(--blue);
+}
+
+.empty {
+  color: var(--ink-soft);
+}
+
+@media (max-width: 980px) {
+  main {
+    padding: 24px;
+  }
+
+  .hero,
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__actions {
+    align-items: flex-start;
+  }
+
+  .editor,
+  textarea,
+  .paper {
+    min-height: 520px;
+  }
+}
+
+@media print {
+  body {
+    background: var(--field);
+  }
+
+  main {
+    width: 100%;
+    padding: 0;
+  }
+
+  .hero,
+  .editor {
+    display: none;
+  }
+
+  .workspace {
+    display: block;
+  }
+
+  .paper {
+    min-height: auto;
+    border: 0;
+    box-shadow: none;
+    padding: 18mm 16mm;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+}

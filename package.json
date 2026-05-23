@@ -1,0 +1,12 @@
+{
+  "name": "korean-pdf-writer",
+  "version": "0.1.0",
+  "private": false,
+  "scripts": {
+    "dev": "python3 -m http.server 3000",
+    "build": "node --check app.js",
+    "start": "python3 -m http.server 3000"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
