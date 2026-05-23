@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="한국어 원문과 마크다운 초안을 단정한 인쇄용 PDF 문서로 정리하는 웹 도구"
+      content="문서 목적과 독자에 맞춰 한국어 원문을 단정한 PDF 문서와 SVG 다이어그램으로 정리하는 오픈소스 도구"
     />
     <title>Korean PDF Writer</title>
     <link rel="stylesheet" href="styles.css" />
@@ -14,16 +14,53 @@
     <main>
       <section class="hero" aria-labelledby="page-title">
         <div class="hero__copy">
-          <p class="eyebrow">Korean PDF Writer</p>
-          <h1 id="page-title">한국어 문서를 조용하고 단정한 PDF로.</h1>
+          <p class="eyebrow">Open-source Korean document composer</p>
+          <h1 id="page-title">내용에 맞는 문서와 SVG를 함께 만듭니다.</h1>
           <p class="lede">
-            초안 마크다운을 붙여 넣으면 화면 오른쪽에서 인쇄용 문서 리듬으로 바로 확인할 수 있습니다.
+            문서 목적, 독자, 톤을 먼저 정한 뒤 원문을 붙여 넣으면 인쇄용 미리보기와 내용 기반 SVG 다이어그램을 자동으로 구성합니다.
           </p>
         </div>
         <div class="hero__actions">
           <button id="print-button" type="button">PDF로 저장</button>
           <span id="character-count">0자</span>
         </div>
+      </section>
+
+      <section class="brief" aria-label="문서 질문">
+        <label>
+          <span>문서 유형</span>
+          <select id="document-type">
+            <option value="guide">전문 가이드</option>
+            <option value="proposal">제안서</option>
+            <option value="report">분석 리포트</option>
+            <option value="lecture">강의 자료</option>
+            <option value="manual">실무 매뉴얼</option>
+          </select>
+        </label>
+        <label>
+          <span>읽는 사람</span>
+          <input id="audience" value="처음 읽는 실무자" />
+        </label>
+        <label>
+          <span>문서 톤</span>
+          <select id="tone">
+            <option value="calm">차분하고 명확하게</option>
+            <option value="executive">의사결정자용으로 간결하게</option>
+            <option value="teaching">교육용으로 쉽게</option>
+            <option value="technical">전문가용으로 정밀하게</option>
+          </select>
+        </label>
+        <label>
+          <span>SVG 방식</span>
+          <select id="diagram-mode">
+            <option value="auto">내용에 맞춰 자동</option>
+            <option value="process">프로세스</option>
+            <option value="timeline">타임라인</option>
+            <option value="comparison">비교</option>
+            <option value="architecture">구조</option>
+            <option value="none">삽입 안 함</option>
+          </select>
+        </label>
       </section>
 
       <section class="workspace" aria-label="문서 작성 영역">

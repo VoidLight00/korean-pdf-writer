@@ -27,6 +27,8 @@ body {
 }
 
 button,
+input,
+select,
 textarea {
   font: inherit;
 }
@@ -112,6 +114,37 @@ textarea:focus-visible {
   font-size: 0.92rem;
 }
 
+.brief {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: clamp(24px, 4vw, 48px);
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: rgb(251 250 245 / 64%);
+}
+
+.brief label {
+  display: grid;
+  gap: 8px;
+}
+
+.brief span {
+  color: var(--blue);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid var(--line);
+  padding: 12px 11px;
+  color: var(--ink);
+  background: var(--field);
+}
+
 .workspace {
   display: grid;
   grid-template-columns: minmax(320px, 0.82fr) minmax(420px, 1.18fr);
@@ -190,6 +223,57 @@ textarea {
   margin-bottom: 1.18rem;
 }
 
+.document-profile {
+  margin-bottom: 2rem;
+  color: var(--blue);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.diagram {
+  margin: 2.8rem 0 2.4rem;
+  padding: 24px 22px 18px;
+  border-top: 2px solid var(--blue);
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--field), var(--paper) 28%);
+}
+
+.diagram figcaption {
+  margin-bottom: 14px;
+  color: var(--blue);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.diagram__svg {
+  width: 100%;
+  height: auto;
+}
+
+.diagram__svg rect,
+.diagram__svg circle {
+  fill: transparent;
+  stroke: var(--blue);
+  stroke-width: 2;
+}
+
+.diagram__svg path {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 2;
+}
+
+.diagram__svg text {
+  fill: var(--blue);
+  font-family: "Noto Serif KR", "Apple SD Gothic Neo", serif;
+  font-size: 16px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
 .paper ul,
 .paper ol {
   margin: 0 0 1.8rem;
@@ -210,6 +294,7 @@ textarea {
   }
 
   .hero,
+  .brief,
   .workspace {
     grid-template-columns: 1fr;
   }
@@ -236,6 +321,7 @@ textarea {
   }
 
   .hero,
+  .brief,
   .editor {
     display: none;
   }
