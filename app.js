@@ -28,8 +28,21 @@ const printButton = document.querySelector("#print-button");
 const documentType = document.querySelector("#document-type");
 const audience = document.querySelector("#audience");
 const tone = document.querySelector("#tone");
+const rewriteMode = document.querySelector("#rewrite-mode");
 const diagramMode = document.querySelector("#diagram-mode");
-const controls = [source, documentType, audience, tone, diagramMode];
+const controls = [source, documentType, audience, tone, rewriteMode, diagramMode];
+
+const labels = {
+  guide: "전문 가이드",
+  proposal: "제안서",
+  report: "분석 리포트",
+  lecture: "강의 자료",
+  manual: "실무 매뉴얼",
+  calm: "차분하고 명확한 톤",
+  executive: "의사결정자용 요약 톤",
+  teaching: "교육용 설명 톤",
+  technical: "전문가용 정밀 톤",
+};
 
 function createTextElement(tagName, text) {
   const element = document.createElement(tagName);
@@ -115,6 +128,13 @@ function textFromBlocks(blocks) {
     .join(" ");
 }
 
+function sentenceList(text) {
+  return text
+    .split(/(?<=[.?!。]|다\.)\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+}
+
 function collectSections(blocks) {
   const sections = [];
   let current = null;
@@ -134,6 +154,77 @@ function collectSections(blocks) {
   return sections;
 }
 
+function sourceTitle(blocks) {
+  const title = blocks.find((block) => block.type === "h1")?.text;
+  return title || "전문 문서 해설";
+}
+
+function topTerms(text) {
+  const stopwords = new Set(["그리고", "하지만", "때문", "문서", "사용자", "내용", "원문", "한국어", "합니다", "있습니다"]);
+  const terms = text.match(/[A-Za-z가-힣0-9]{2,}/g) || [];
+  const counts = terms.reduce((acc, term) => {
+    if (stopwords.has(term)) return acc;
+    return { ...acc, [term]: (acc[term] || 0) + 1 };
+  }, {});
+
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([term]) => term);
+}
+
+function selectImportantSentences(text, count) {
+  return sentenceList(text)
+    .filter((sentence) => sentence.length > 18)
+    .sort((a, b) => b.length - a.length)
+    .slice(0, count);
+}
+
+function createEasyBlocks(rawBlocks) {
+  const text = textFromBlocks(rawBlocks);
+  const sections = collectSections(rawBlocks);
+  const title = sourceTitle(rawBlocks);
+  const terms = topTerms(text);
+  const keySentences = selectImportantSentences(text, 4);
+  const firstSection = sections[0]?.items[0] || keySentences[0] || text.slice(0, 120);
+  const audienceText = audience.value || "독자";
+
+  return [
+    { type: "h1", text: `${title} 쉽게 이해하기` },
+    { type: "h2", text: "이 문서는 누구를 위한 것인가" },
+    { type: "paragraph", text: `${audienceText}가 핵심 개념을 빠르게 이해하고, 실제 판단이나 실행에 옮길 수 있도록 재구성한 ${labels[documentType.value]}입니다.` },
+    { type: "h2", text: "한 문장 요약" },
+    { type: "paragraph", text: firstSection },
+    { type: "h2", text: "핵심 개념" },
+    { type: "list", ordered: false, items: terms.length ? terms.map((term) => `${term}: 원문에서 반복되거나 판단 기준이 되는 주요 개념입니다.`) : ["핵심 개념: 원문에서 가장 자주 등장하는 판단 단위입니다."] },
+    { type: "h2", text: "쉬운 비유" },
+    { type: "paragraph", text: "이 문서는 복잡한 기계를 조립하기 전에 부품 이름, 연결 순서, 완성 후 점검 기준을 먼저 정리하는 설명서에 가깝습니다." },
+    { type: "h2", text: "이해 순서" },
+    { type: "list", ordered: true, items: buildSteps(sections, keySentences) },
+    { type: "h2", text: "실무 체크리스트" },
+    { type: "list", ordered: false, items: buildChecklist(terms) },
+    { type: "h2", text: "원문에서 놓치면 안 되는 문장" },
+    { type: "list", ordered: false, items: keySentences.length ? keySentences : [firstSection] },
+  ];
+}
+
+function buildSteps(sections, sentences) {
+  const sectionTitles = sections.map((section) => section.title).filter(Boolean).slice(0, 4);
+  if (sectionTitles.length >= 3) return sectionTitles.map((title) => `${title} 내용을 먼저 확인합니다.`);
+
+  return (sentences.length ? sentences : ["문제 정의", "핵심 원리", "실행 방법"]).slice(0, 4).map((sentence) => sentence.replace(/[.。]$/, ""));
+}
+
+function buildChecklist(terms) {
+  const baseTerms = terms.length ? terms.slice(0, 4) : ["목적", "독자", "절차", "결과"];
+  return baseTerms.map((term) => `${term}이 실제 문서 안에서 무엇을 의미하는지 확인했습니다.`);
+}
+
+function documentBlocks(rawBlocks) {
+  if (rewriteMode.value === "preserve") return rawBlocks;
+  return createEasyBlocks(rawBlocks);
+}
+
 function inferDiagramType(blocks) {
   if (diagramMode.value !== "auto") return diagramMode.value;
 
@@ -141,7 +232,7 @@ function inferDiagramType(blocks) {
   if (/비교|차이|장점|단점|대안|vs/i.test(text)) return "comparison";
   if (/일정|단계|로드맵|분기|주차|월|년/i.test(text)) return "timeline";
   if (/구조|아키텍처|시스템|입력|출력|렌더러|데이터/i.test(text)) return "architecture";
-  if (/흐름|프로세스|절차|순서|실행|처리/i.test(text)) return "process";
+  if (/흐름|프로세스|절차|순서|실행|처리|이해 순서/i.test(text)) return "process";
   return "process";
 }
 
@@ -149,9 +240,9 @@ function pickItems(blocks, diagramType) {
   const sections = collectSections(blocks);
   const matched = sections.find((section) => {
     if (diagramType === "comparison") return /비교|대안|차이|장단점/.test(section.title);
-    if (diagramType === "timeline") return /일정|로드맵|단계|계획/.test(section.title);
+    if (diagramType === "timeline") return /일정|로드맵|단계|계획|순서/.test(section.title);
     if (diagramType === "architecture") return /구조|시스템|아키텍처/.test(section.title);
-    return /흐름|절차|순서|실행|처리|계획/.test(section.title);
+    return /흐름|절차|순서|실행|처리|계획|이해/.test(section.title);
   });
 
   const sourceItems = matched?.items.length ? matched.items : sections.flatMap((section) => section.items);
@@ -160,7 +251,7 @@ function pickItems(blocks, diagramType) {
 
 function diagramTitle(type) {
   const titles = {
-    process: "처리 흐름",
+    process: "이해 흐름",
     timeline: "문서 전개 단계",
     comparison: "핵심 비교",
     architecture: "구조 개요",
@@ -169,13 +260,12 @@ function diagramTitle(type) {
 }
 
 function createSvg(label, height) {
-  const svg = createSvgElement("svg", {
+  return createSvgElement("svg", {
     class: "diagram__svg",
     viewBox: `0 0 720 ${height}`,
     role: "img",
     "aria-label": label,
   });
-  return svg;
 }
 
 function appendCenteredText(svg, x, y, text, attributes = {}) {
@@ -187,9 +277,7 @@ function renderProcessSvg(items) {
 
   items.forEach((item, index) => {
     const x = 48 + index * 172;
-    if (index < items.length - 1) {
-      svg.appendChild(createSvgElement("path", { d: `M${x + 118} 84 H${x + 152}` }));
-    }
+    if (index < items.length - 1) svg.appendChild(createSvgElement("path", { d: `M${x + 118} 84 H${x + 152}` }));
     svg.appendChild(createSvgElement("rect", { x, y: 38, width: 118, height: 92, rx: 0 }));
     appendCenteredText(svg, x + 59, 78, String(index + 1));
     appendCenteredText(svg, x + 59, 103, item.slice(0, 12));
@@ -227,16 +315,16 @@ function renderComparisonSvg(items) {
 
 function renderArchitectureSvg(items) {
   const svg = createSvg("구조 개요 다이어그램", 210);
-  const labels = items.length >= 3 ? items.slice(0, 3) : ["원문 입력", "문서 렌더러", "PDF 출력"];
+  const labelsForNodes = items.length >= 3 ? items.slice(0, 3) : ["원문 입력", "문서 렌더러", "PDF 출력"];
 
   svg.appendChild(createSvgElement("rect", { x: 56, y: 70, width: 150, height: 72 }));
   svg.appendChild(createSvgElement("rect", { x: 285, y: 42, width: 150, height: 126 }));
   svg.appendChild(createSvgElement("rect", { x: 514, y: 70, width: 150, height: 72 }));
   svg.appendChild(createSvgElement("path", { d: "M206 106 H285" }));
   svg.appendChild(createSvgElement("path", { d: "M435 106 H514" }));
-  appendCenteredText(svg, 131, 112, labels[0].slice(0, 12));
-  appendCenteredText(svg, 360, 112, labels[1].slice(0, 12));
-  appendCenteredText(svg, 589, 112, labels[2].slice(0, 12));
+  appendCenteredText(svg, 131, 112, labelsForNodes[0].slice(0, 12));
+  appendCenteredText(svg, 360, 112, labelsForNodes[1].slice(0, 12));
+  appendCenteredText(svg, 589, 112, labelsForNodes[2].slice(0, 12));
   return svg;
 }
 
@@ -259,19 +347,8 @@ function createDiagram(blocks) {
 }
 
 function profileText() {
-  const labels = {
-    guide: "전문 가이드",
-    proposal: "제안서",
-    report: "분석 리포트",
-    lecture: "강의 자료",
-    manual: "실무 매뉴얼",
-    calm: "차분하고 명확한 톤",
-    executive: "의사결정자용 요약 톤",
-    teaching: "교육용 설명 톤",
-    technical: "전문가용 정밀 톤",
-  };
-
-  return `${labels[documentType.value]} · ${audience.value || "독자 미지정"} · ${labels[tone.value]}`;
+  const modeLabel = rewriteMode.value === "explain" ? "쉽게 재구성" : "원문 유지";
+  return `${labels[documentType.value]} · ${audience.value || "독자 미지정"} · ${labels[tone.value]} · ${modeLabel}`;
 }
 
 function renderBlock(block) {
@@ -280,15 +357,14 @@ function renderBlock(block) {
   if (block.type === "paragraph") return createTextElement("p", block.text);
 
   const list = document.createElement(block.ordered ? "ol" : "ul");
-  block.items.forEach((item) => {
-    list.appendChild(createTextElement("li", item));
-  });
+  block.items.forEach((item) => list.appendChild(createTextElement("li", item)));
   return list;
 }
 
 function render() {
   const value = source.value;
-  const blocks = parseMarkdown(value);
+  const rawBlocks = parseMarkdown(value);
+  const blocks = documentBlocks(rawBlocks);
   paper.replaceChildren();
   characterCount.textContent = `${value.replace(/\s/g, "").length.toLocaleString("ko-KR")}자`;
 
@@ -305,7 +381,7 @@ function render() {
 
   blocks.forEach((block, index) => {
     paper.appendChild(renderBlock(block));
-    if (index === 2) {
+    if (index === 4) {
       const diagram = createDiagram(blocks);
       if (diagram) paper.appendChild(diagram);
     }
