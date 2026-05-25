@@ -1,5 +1,7 @@
 # Korean PDF Writer
 
+![Korean PDF Writer 미리보기](assets/hero.png)
+
 문서 목적과 독자에 맞춰 어려운 한국어 기술 문서를 쉽게 재구성하고, 내용 기반 SVG 다이어그램과 함께 단정한 PDF로 출력하는 오픈소스 웹 도구입니다.
 
 ## 특징
